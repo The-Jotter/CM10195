@@ -1,0 +1,123 @@
+---
+title: An Introduction to Scheduling
+date: 20-02-2023
+---
+
+# Scheduling
+## But what is scheduling?
+
+Scheduling is the process of figuring out what process to run next.
+
+This is a quite divisive issue with many different solutions.
+
+We'll be focusing on sharing CPU time.
+
+### Goals
+* Service peripherals in a timely manner
+* Understand various requirements of hardware: mice, keyboards are slow; memory is fast.
+* Distribute work amongst multiple devices; e.g. CPU and newtork.
+* Make best use of the hardware &mdash; efficient use.
+* Use predictable behaviour
+* Try to gracefully degrade over heavy load*
+* **And do it all Quickly**
+
+*Performing the best you can, whike trying to keep up.
+
+### Measurements
+To quantify the need of running a certain process, the OS can collect many measurements:
+* CPU cycles used
+* Memory used
+* Disk used
+* Network used
+* Etc.
+
+Some general measurements:
+* Throughput &mdash; how many jobs finished in a given time.
+* Turnaround &mdash; response times - is it snappy or sluggish?
+* Real-time  &mdash; must handle data now.
+* Money      &mdash; we're given money to complete this task within the next hour.
+* Etc. 
+
+## Scheduling Algorithms
+### Run until completion
+First in, first out: just run the tasks in order after the previous has finished.
+
+* Good for large amounts of computation
+* No multitasking overheads
+* Not suitable for general-purpose computing
+
+### Shortest Job First
+Shortest-time-to-completeion runs next, wait until finished; repeat.
+
+* No multitasking
+* Good throughput
+* Long jobs are delayed.
+* Difficult to estimate how long a job takes to complete
+
+### Cooperative Multitasking (+ Run until finished)
+Each program decides when to give back control to the OS,
+which then can resume another program.
+
+* Non pre-emptive (OS doesn't intervine)
+* Weak multitasking
+* Uses a round-robin or similar algorithm to choose another task
+* Programs must be "good citizen" programs &mdash; this can be both hard to write,
+    and has no method to enforce this.
+
+### Round Robin
+Give each process a fixed amount of time, a *time slice*.
+Once a program has ran out of time, the next program is allocated time.
+
+* Multitasking
+* Pre-emptive
+* All processes have equal priority; this may not be ideal.
+* Better interactivity then cooperative multitasking; but not ideal for interactivity.
+
+### Shortest Remaining Time
+Use time slicing, pick the program with the fewest time left.
+* Pre-emptive
+* Good throughput
+* Long jobs can stil be starved
+
+### Least Completed Next
+OS chooses the process that has consumed the least amount of CPU time.
+
+* All processes make equal progress (in terms of CPU time)
+* Interactive processes get good attention.
+* Long jobs can be starved.
+
+## An Overview
+Processes compete for resources, which the OS must handle.
+
+From the program's perspective:
+1. This demand is signaled to the OS by calling the kernel.
+2. The program 'waits' for the kernel to reply.
+3. The kernel replies, and program continues execution.
+
+The OS, however does:
+1. OS receives a system call.
+2. It blocks the program.
+3. It preforms other stuff.
+4. It comes back to the program, and resumes execution.
+
+### Deadlock 
+Sometimes, the program never resumes.
+
+Imagine the scenario:
+1. Program 1 requests access to Disk 1 from the OS.
+2. The OS replies, giving it control of D1. Then, it continues to P2.
+3. Program 2 requests access to Disk 2 from the OS.
+4. The OS replies, giving P2 access to Disk 2. Then, it continues to P1.
+5. The OS goes back to P1, which now asks for access to D2!
+6. The OS will mark the program as blocked to wait for P2.
+7. Now, P2 is resumed: it wants D1 now!
+8. The OS marks the task as blocked.
+
+Now, both tasks are blocked and no-one makes progress: this is known as deadlock.
+
+#### Coffman Conditions
+These are conditions which deadlock will occur if they happen simultaneously:
+* **Mutual Exclusion**: Only one process can use a resource at a time.
+* **Hold-and-wait**: A process continues to hold a resource while waiting for other resources.
+* **No preemption**: No resource is forcibly removed from a process by the OS.
+* **Circular Wait**: There's a circular chain of processes where each holds a reource that's needed by the next. 
