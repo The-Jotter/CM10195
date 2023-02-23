@@ -1,0 +1,60 @@
+---
+title : Introduction to processes
+date  : 2023-02-13
+slides: https://moodle.bath.ac.uk/mod/resource/view.php?id=1194254
+---
+
+# Processes
+
+## But, what what is a process ?
+* executeable code;
+* its data;
+* associated information the OS needs to run it
+
+Other terms include:
+* tasks
+* jobs
+
+### Associated Information
+* Where its code and data is stored in memory
+* Program's permissions on parts of memory
+* Resource management (CPU time, memory, I/O, networking):
+    * How much \_\_\_\_ it's allocated
+    * How much \_\_\_\_ has it used
+* The CPU's PC and data registers
+* Other factors
+
+## Simplified States of a Process
+| State | Description |
+|-------|-------------|
+| New   | Process just been created |
+| Running | Currently executing on the CPU |
+| Ready | Ready to run, but other processes (or OS) are using the CPU |
+| Blocked | Waiting for some event or resource to become available |
+| Exit | Process that has finished. |
+
+This could be modelled as a finite-state machine.
+
+### Time-Scheduling
+OSes have a collection of processes and must keep track of (monitor) each processes' state.
+Real OSes also will handle time-scheduling with more complexity &mdash; such as priorise
+certain tasks over other. 
+
+### A Typical state Transition
+1. The OS decides to schedule a program that is `READY`.
+2. The process is dispatched (OS marks as `RUNNING`) and begins execution
+3. Process moves to `READY` state as:
+    * The program may voluntarily suspend itself:
+    relinquish; or
+    * an interrupt may arise; or
+    * a timer interrupt may happend (when the process has used all of its allocated CPU time.); or
+    * the process needs some resource from the OS (communicated by a system call)
+        and must wait until the resource is ready. The OS will move the process to `BLOCKED`.
+4. If a `BLOCKED` process' data is ready, the CPU can un-suspend the process and mark it as `READY`. 
+
+### The Process Control Block (PCB)
+The kinds of data the OS needs to store/manage about processes:
+* User identifiers (userids)
+* priotrity
+* stats like memory/CPU usage
+* states of the registers when it last was suspended
